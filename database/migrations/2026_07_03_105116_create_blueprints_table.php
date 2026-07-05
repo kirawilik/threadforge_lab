@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name');
     $table->string('target_audience');
     $table->string('tone');
+    
     $table->integer('max_characters')->default(250);
     $table->integer('max_hashtags')->default(1);
             $table->timestamps();
