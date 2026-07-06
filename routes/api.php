@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BlueprintController;
+use App\Http\Controllers\Api\ContentController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,4 +15,5 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/blueprints', [BlueprintController::class, 'store']);
     Route::put('/blueprints/{blueprint}', [BlueprintController::class, 'update']);
     Route::delete('/blueprints/{blueprint}', [BlueprintController::class, 'destroy']);
+    Route::post('/content/repurpose', [ContentController::class, 'repurpose']);
     });
