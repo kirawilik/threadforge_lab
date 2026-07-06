@@ -9,6 +9,7 @@ USE App\Http\Resources\PostResource;
 use App\Ai\Agents\PostGenerator;
 use App\Models\Post;
 use App\Enums\PostStatus;
+use App\Jobs\GeneratePostJob;
 
 
 class ContentController extends Controller
@@ -31,40 +32,24 @@ class ContentController extends Controller
      */
     public function repurpose(StorePostRequest $request)
     {
-        $response = (new PostGenerator)
-            ->prompt($request->validated('raw_content'));
+     $post = Post::create([
 
-        $post = Post::create([
+        'user_id' => auth()->id(),
 
-            'user_id' => auth()->id(),
+        'blueprint_id' => $request->validated('blueprint_id'),
 
-            'blueprint_id'
-                => $request->validated('blueprint_id'),
+        'raw_content' => $request->validated('raw_content'),
 
-            'raw_content'
-                => $request->validated('raw_content'),
+        'status' => PostStatus::Pending,
 
-            'hook_propose'
-                => $response['hook_propose'],
+    ]);
 
-            'body_points'
-                => $response['body_points'],
+    GeneratePostJob::dispatch($post);
 
-            'technical_readability_score'
-                => $response['technical_readability_score'],
-
-            'suggested_hashtags'
-                => $response['suggested_hashtags'],
-
-            'tone_compliance_justification'
-                => $response['tone_compliance_justification'],
-
-            'status' => PostStatus::Draft,
-        ]);
-
-        return (new PostResource($post))
-            ->response()
-            ->setStatusCode(201);
+    return response()->json([
+        'message' => 'Post generation queued.',
+        'post_id' => $post->id,
+    ], 202);
     }
 
     /**
