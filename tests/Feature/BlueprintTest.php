@@ -37,3 +37,33 @@ it('liste les blueprints d un utilisateur authentifie', function () {
             ]
         ]);
 });
+it('rejette une requête sans token', function () {
+
+    $response = $this->getJson('/api/blueprints');
+
+    $response->assertStatus(401);
+
+});
+it('refuse un blueprint invalide', function () {
+
+    Sanctum::actingAs(User::factory()->create());
+
+    $response = $this->postJson('/api/blueprints', [
+        'name' => '',
+        'target_audience' => '',
+        'tone' => '',
+        'max_characters' => '',
+        'max_hashtags' => '',
+    ]);
+
+    $response
+        ->assertStatus(422)
+        ->assertJsonValidationErrors([
+            'name',
+            'target_audience',
+            'tone',
+            'max_characters',
+            'max_hashtags',
+        ]);
+
+});
