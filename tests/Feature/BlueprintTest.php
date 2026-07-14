@@ -65,5 +65,11 @@ it('refuse un blueprint invalide', function () {
             'max_characters',
             'max_hashtags',
         ]);
+  it('rejette une requête sans token', function () {
 
+    $response = $this->getJson('/api/blueprints');
+
+    $response->assertStatus(401);
+
+});
 });
